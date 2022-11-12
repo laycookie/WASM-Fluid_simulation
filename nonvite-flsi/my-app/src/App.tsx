@@ -56,26 +56,32 @@ function App() {
       // === creating objects ===
       // walls
       let walls: Box2D.b2Body;
-      function createBorderWalls() {
+      function createBorderWalls(windowDimansionsLocal: Point) {
         const bd_walls = new b2BodyDef();
         const floorShape = new b2EdgeShape();
         floorShape.SetTwoSided(
-          new b2Vec2(0, (windowDimansions.y + 0) / 32),
-          new b2Vec2(windowDimansions.x / 32, (windowDimansions.y + 0) / 32)
+          new b2Vec2(0, (windowDimansionsLocal.y + 0) / 32),
+          new b2Vec2(
+            windowDimansionsLocal.x / 32,
+            (windowDimansionsLocal.y + 0) / 32
+          )
         );
         const roofShape = new b2EdgeShape();
         roofShape.SetTwoSided(
           new b2Vec2(0, 0),
-          new b2Vec2(windowDimansions.x / 32, 0)
+          new b2Vec2(windowDimansionsLocal.x / 32, 0)
         );
         const rightWallShape = new b2EdgeShape();
         rightWallShape.SetTwoSided(
-          new b2Vec2(windowDimansions.x / 32, 0),
-          new b2Vec2(windowDimansions.x / 32, (windowDimansions.y + 0) / 32)
+          new b2Vec2(windowDimansionsLocal.x / 32, 0),
+          new b2Vec2(
+            windowDimansionsLocal.x / 32,
+            (windowDimansionsLocal.y + 0) / 32
+          )
         );
         const leftWallShape = new b2EdgeShape();
         leftWallShape.SetTwoSided(
-          new b2Vec2(0, (windowDimansions.y + 0) / 32),
+          new b2Vec2(0, (windowDimansionsLocal.y + 0) / 32),
           new b2Vec2(0, 0)
         );
         walls = world.CreateBody(bd_walls);
@@ -84,11 +90,14 @@ function App() {
         walls.CreateFixture(rightWallShape, 0);
         walls.CreateFixture(leftWallShape, 0);
       }
-      createBorderWalls();
+      createBorderWalls(windowDimansions);
       window.onresize = () => {
-        walls.DestroyFixture(walls.GetFixtureList());
-        createBorderWalls();
-        console.log(windowDimansions);
+        const windowDimansionsLocal: Point = {
+          x: window.innerWidth,
+          y: window.innerHeight,
+        };
+        world.DestroyBody(walls);
+        createBorderWalls(windowDimansionsLocal);
       };
 
       // particles
