@@ -103,7 +103,7 @@ function App() {
       // particles
       const square = new b2PolygonShape();
       square.SetAsBox(0.5, 1);
-      const AmounthOfBoxes = 10;
+      const AmounthOfBoxes = 300;
       for (let i = 0; i < AmounthOfBoxes; i++) {
         const bd_sqr = new b2BodyDef();
         bd_sqr.set_type(b2_dynamicBody);
