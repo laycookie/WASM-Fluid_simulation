@@ -6,20 +6,50 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
+        exclude: /node_modules/,
+        use: ["file-loader?name=[name].[ext]"], // ?name=[name].[ext] is only necessary to preserve the original file name
+      },
+      {
+        test: /\.css$/,
+        exclude: /(node_modules)/,
+        use: [{ loader: "style-loader" }, { loader: "css-loader" }],
+      },
+      {
         test: /\.json$/,
         use: "json-loader",
       },
       {
         test: /\.(js)x?$/,
-        exclude: /node_modules/,
+        exclude: /node_modules|\.d\.ts$/,
         use: "babel-loader",
       },
       {
-        test: /\.js$|jsx/,
-        exclude: /node_modules|\.d\.ts$/,
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+          },
+        },
+      },
+      {
+        test: /\.(ts)x?$|\.d\.ts$/,
+        exclude: /node_modules/,
         use: {
           loader: "ts-loader",
+          options: {
+            compilerOptions: {
+              noEmit: false,
+            },
+          },
         },
+      },
+      {
+        test: /\.ts$/,
+        use: "ts-loader",
+        exclude: /node_modules|\.d\.ts$/,
       },
     ],
   },
