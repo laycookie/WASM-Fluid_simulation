@@ -10,6 +10,7 @@ interface Point {
 }
 
 function App() {
+  console.log("App");
   const SCanvas: RefObject<HTMLCanvasElement> = useRef(null);
   // Sizes the canvas to the window (You can not do it trought the css becouse css will just strech the canvas)
   const [windowDimansions, setWindowDimansions] = useState<Point>({
