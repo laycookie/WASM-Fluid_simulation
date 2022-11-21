@@ -19,17 +19,20 @@ module.exports = {
         exclude: /node_modules|\.d\.ts$/,
         use: {
           loader: "ts-loader",
-          options: {
-            compilerOptions: {
-              noEmit: false,
-            },
-          },
         },
       },
     ],
   },
+  devServer: {
+    static: {
+      directory: path.join(__dirname, "public"),
+    },
+    compress: true,
+    port: 8080,
+  },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
+    modules: ["src", "node_modules"],
     fallback: {
       fs: false,
       tls: false,
@@ -46,7 +49,7 @@ module.exports = {
     topLevelAwait: true,
   },
   output: {
+    path: path.resolve(__dirname, "dist/build"),
     filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
   },
 };
