@@ -23,13 +23,6 @@ module.exports = {
       },
     ],
   },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, "public"),
-    },
-    compress: true,
-    port: 8080,
-  },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     modules: ["src", "node_modules"],
@@ -47,6 +40,13 @@ module.exports = {
   },
   experiments: {
     topLevelAwait: true,
+  },
+  devServer: {
+    static: {
+      directory: path.join(__dirname, "public"),
+    },
+    compress: true,
+    port: 8080,
   },
   output: {
     path: path.resolve(__dirname, "dist/build"),
