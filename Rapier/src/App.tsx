@@ -19,14 +19,18 @@ function App() {
       // Run the simulation.
       let world = new RAPIER.World({ x: 0.0, y: -0.5 });
 
-      function createBody() {
-        let rigidBody = world.createRigidBody(
+      interface RigidBody extends RAPIER.RigidBody {
+        color?: String;
+      }
+      function createBody(location: [number, number], color: string) {
+        let rigidBody: RigidBody = world.createRigidBody(
           RAPIER.RigidBodyDesc.dynamic()
             .setAngularDamping(0)
             .setCanSleep(false)
             .setCcdEnabled(true)
-            .setTranslation(50, 0)
+            .setTranslation(location[0], location[1])
         );
+        rigidBody.color = color;
 
         let collider = world.createCollider(
           RAPIER.ColliderDesc.ball(10).setFriction(0).setRestitution(1),
@@ -34,9 +38,10 @@ function App() {
         );
         return rigidBody;
       }
-      let rigidBody = createBody();
+      let rigidBody = createBody([50, 0], "red");
+      let rigidBody1 = createBody([100, 0], "green");
 
-      const ridgedBodiesRender = [rigidBody];
+      const ridgedBodiesRender = [rigidBody, rigidBody1];
       // set up the rendering
       function drawFromRapierrigidBody(bodies: RAPIER.RigidBody[]) {
         bodies.forEach((body) => {
@@ -47,7 +52,7 @@ function App() {
           ctx.rotate(angle);
           ctx.beginPath();
           ctx.arc(0, 0, 10, 0, 2 * Math.PI);
-          ctx.fillStyle = "red";
+          ctx.fillStyle = body.color;
           ctx.fill();
           ctx.restore();
         });
@@ -62,10 +67,6 @@ function App() {
           SCanvas.current?.height as number
         );
         drawFromRapierrigidBody(ridgedBodiesRender);
-
-        // Get the rigid-body position.
-        let position = rigidBody.translation();
-        console.log("Rigid-body position: ", position.x, position.y);
       }
       requestAnimationFrame(animate);
     }
