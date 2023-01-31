@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, RefObject } from "react";
 import reactLogo from "./assets/react.svg";
 import RAPIER, { RigidBodyDesc } from "@dimforge/rapier2d-compat";
+import * as PIXI from "pixi.js";
 import "./App.css";
 
 function App() {
@@ -11,25 +12,24 @@ function App() {
       console.error("Canvas not found");
       return;
     }
-    const ctx: CanvasRenderingContext2D = SCanvas.current.getContext(
-      "2d"
-    ) as CanvasRenderingContext2D;
+
     async function run_simulation() {
       await RAPIER.init();
       // Run the simulation.
-      let world = new RAPIER.World({ x: 0.0, y: -0.5 });
+      let world = new RAPIER.World({ x: 0.0, y: 0.5 });
 
       interface RigidBody extends RAPIER.RigidBody {
-        color?: String;
+        color?: number;
       }
-      function createBody(location: [number, number], color: string) {
+      function createBody(x: number, y: number, color: number) {
         let rigidBody: RigidBody = world.createRigidBody(
           RAPIER.RigidBodyDesc.dynamic()
             .setAngularDamping(0)
             .setCanSleep(false)
             .setCcdEnabled(true)
-            .setTranslation(location[0], location[1])
+            .setTranslation(x, y)
         );
+
         rigidBody.color = color;
 
         let collider = world.createCollider(
@@ -38,35 +38,71 @@ function App() {
         );
         return rigidBody;
       }
-      let rigidBody = createBody([50, 0], "red");
-      let rigidBody1 = createBody([100, 0], "green");
+      function createWall(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        color: number
+      ) {
+        let rigidBody: RigidBody = world.createRigidBody(
+          RAPIER.RigidBodyDesc.fixed().setTranslation(x, y)
+        );
+        rigidBody.color = color;
+        let collider = world.createCollider(
+          RAPIER.ColliderDesc.cuboid(width, height),
+          rigidBody
+        );
+        return rigidBody;
+      }
+      let rigidBody = createBody(50, 0, 0xff0000);
+      let rigidBody1 = createBody(100, 0, 0x00ff00);
+      let ground = createWall(50, 250, 1000, 10, 0x0000ff);
 
-      const ridgedBodiesRender = [rigidBody, rigidBody1];
+      const ridgedBodiesRender = [rigidBody, rigidBody1, ground];
       // set up the rendering
-      function drawFromRapierrigidBody(bodies: RAPIER.RigidBody[]) {
+      if (SCanvas.current === null) return;
+      const app = new PIXI.Application({
+        width: 500,
+        height: 500,
+        view: SCanvas.current as HTMLCanvasElement,
+        backgroundColor: 0xeeeeee,
+        antialias: true,
+      });
+      // render rigid bodies from rapier to pixi
+
+      // function drawFromRapierrigidBody(bodies: RigidBody[]) {
+      //   bodies.forEach((body) => {
+      //     let position = body.translation();
+      //     let angle = body.rotation();
+      //     ctx.save();
+      //     ctx.translate(position.x, -position.y);
+      //     ctx.rotate(angle);
+      //     ctx.beginPath();
+      //     ctx.arc(0, 0, 10, 0, 2 * Math.PI);
+      //     ctx.fillStyle = body.color as string;
+      //     ctx.fill();
+      //     ctx.restore();
+      //   });
+      // }
+      function renderRapier(bodies: RigidBody[]) {
+        app.stage.removeChildren();
         bodies.forEach((body) => {
           let position = body.translation();
           let angle = body.rotation();
-          ctx.save();
-          ctx.translate(position.x, -position.y);
-          ctx.rotate(angle);
-          ctx.beginPath();
-          ctx.arc(0, 0, 10, 0, 2 * Math.PI);
-          ctx.fillStyle = body.color;
-          ctx.fill();
-          ctx.restore();
+          let graphics = new PIXI.Graphics();
+          graphics.beginFill(body.color as number);
+          graphics.drawCircle(position.x, position.y, 10);
+          graphics.endFill();
+          app.stage.addChild(graphics);
         });
       }
       function animate(time: unknown) {
         requestAnimationFrame(animate);
         world.step();
-        ctx.clearRect(
-          0,
-          0,
-          SCanvas.current?.width as number,
-          SCanvas.current?.height as number
-        );
-        drawFromRapierrigidBody(ridgedBodiesRender);
+        console.log(rigidBody.translation());
+        console.log(rigidBody1.translation());
+        renderRapier(ridgedBodiesRender);
       }
       requestAnimationFrame(animate);
     }
@@ -75,7 +111,7 @@ function App() {
   return (
     <>
       <h1>test</h1>
-      <canvas height={500} width={500} ref={SCanvas}></canvas>
+      <canvas ref={SCanvas}></canvas>
     </>
   );
 }
