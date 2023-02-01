@@ -69,22 +69,6 @@ function App() {
         backgroundColor: 0xeeeeee,
         antialias: true,
       });
-      // render rigid bodies from rapier to pixi
-
-      // function drawFromRapierrigidBody(bodies: RigidBody[]) {
-      //   bodies.forEach((body) => {
-      //     let position = body.translation();
-      //     let angle = body.rotation();
-      //     ctx.save();
-      //     ctx.translate(position.x, -position.y);
-      //     ctx.rotate(angle);
-      //     ctx.beginPath();
-      //     ctx.arc(0, 0, 10, 0, 2 * Math.PI);
-      //     ctx.fillStyle = body.color as string;
-      //     ctx.fill();
-      //     ctx.restore();
-      //   });
-      // }
       function renderRapier(bodies: RigidBody[]) {
         app.stage.removeChildren();
         bodies.forEach((body) => {
@@ -100,8 +84,6 @@ function App() {
       function animate(time: unknown) {
         requestAnimationFrame(animate);
         world.step();
-        console.log(rigidBody.translation());
-        console.log(rigidBody1.translation());
         renderRapier(ridgedBodiesRender);
       }
       requestAnimationFrame(animate);
